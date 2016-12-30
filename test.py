@@ -1,4 +1,4 @@
 from subprocess import call
 
-call(["python", "-m", "unittest", "discover", "tests"])
+call(["python", "-m", "unittest", "discover", "-v", "tests"])
 
