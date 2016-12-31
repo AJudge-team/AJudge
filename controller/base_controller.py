@@ -62,7 +62,6 @@ class BaseController(ControllerMixin):
         runner = self.choose_runner(runtime_context)
 
         sandbox = runner.prepare(runtime_context)
+        runner.run(runtime_context, sandbox)
 
-        judge_result = runner.run(runtime_context, sandbox)
-
-        return judge_result
+        return JudgeResult()

@@ -8,6 +8,20 @@ from runner import *
 from sandbox import *
 
 
+class MockCppRunner(Runner):
+    def prepare(self, runtime_context: RuntimeContext) -> SandboxMixin:
+        print("Prepare CPP")
+        return MockSandbox()
+
+    def run(self, runtime_context: RuntimeContext, sandbox: SandboxMixin):
+        print("Run CPP")
+
+
+class MockSandbox(SandboxMixin):
+    def exec(self, cmd: str):
+        print("Execute")
+
+
 class TestBaseController(unittest.TestCase):
     def setUp(self):
         problem_provider = ProblemProvider()
@@ -46,20 +60,7 @@ class TestBaseController(unittest.TestCase):
         )
 
     def test_choose_runner1(self):
-
-        class MockSandbox(SandboxMixin):
-            def exec(self, cmd: str):
-                print("Executed")
-
-        class CppRunner(Runner):
-            def prepare(self, runtime_context: RuntimeContext) -> SandboxMixin:
-                print("Prepare")
-                return MockSandbox()
-
-            def run(self, runtime_context: RuntimeContext, sandbox: SandboxMixin):
-                print("Run")
-
-        cpp_runner = CppRunner()
+        cpp_runner = MockCppRunner()
         rc = RuntimeContext(programming_language=ProgrammingLanguage.CPP)
 
         self.base_controller.add_runner(
