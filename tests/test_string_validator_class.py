@@ -8,7 +8,7 @@ class StringValidatorClassTest(unittest.TestCase):
         self.stringValidator = StringValidator()
 
     def test_validate_correct1(self):
-        result = self.stringValidator.validate("abcdef", "abcdefg")
+        result = self.stringValidator.validate("abcdefg", "abcdefg")
         self.assertTrue(result)
 
     def test_validate_correct2(self):
