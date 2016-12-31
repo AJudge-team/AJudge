@@ -5,6 +5,7 @@ from consts import ProgrammingLanguage
 from provider import ProblemProvider
 from typing import Dict
 from validator import ValidatorMixin
+from exception import *
 
 
 # class implementation for controller interface
@@ -58,10 +59,33 @@ class BaseController(ControllerMixin):
 
     def handle(self, judge_context: JudgeContext) -> JudgeResult:
         runtime_context = self.analyze(judge_context)
-
         runner = self.choose_runner(runtime_context)
 
-        sandbox = runner.prepare(runtime_context)
-        runner.run(runtime_context, sandbox)
+        judge_result = JudgeResult()
 
-        return JudgeResult()
+        user_outputs = None
+
+        try:
+            sandbox = runner.prepare(runtime_context)
+            user_outputs = runner.run(runtime_context, sandbox)
+
+            if len(user_outputs) is not len(runtime_context.problem_metadata.outputs):
+                raise Exception('Wrong answer')
+
+            for i in range(0, len(user_outputs)):
+                result = self.__validator.validate(
+                    user_outputs[i],
+                    runtime_context.problem_metadata.outputs[i]
+                )
+
+                if result is False:
+                    raise Exception('Wrong answer')
+
+            judge_result.is_accepted = True
+
+        except Exception as e:
+            judge_result.is_accepted = False
+            judge_result.message = e
+
+        print(judge_result.is_accepted)
+        return judge_result

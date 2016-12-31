@@ -54,6 +54,12 @@ class MockCppRunner(Runner):
             runtime_context.problem_metadata.problem_id
         ))
 
+        problem_provider = ProblemProvider()
+
+        return problem_provider.get_problem_metadata_by_id(
+            runtime_context.problem_metadata.problem_id
+        ).outputs
+
 
 @cli.app.CommandLineApp
 def start(app):
