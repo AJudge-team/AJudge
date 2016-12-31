@@ -45,19 +45,21 @@ class Sandbox(object):
         return {"Output": exec_output, "ExitCode": exec_info.get('ExitCode')}
 
     def copy_file_to_container(self, host_directory: str, container_directory: str) -> dict:
-        cur_directory = os.popen('locate "AJudge/sandbox/sandbox.py"').read()
-        cur_directory = cur_directory[:-11]
+        cur_directory = os.path.dirname(__file__)  # find absolute path
         os.chdir(cur_directory)
 
         data_tar_stream = BytesIO()
         data_tar = tarfile.TarFile(fileobj=data_tar_stream, mode="w")
         data = open(host_directory).read().encode("utf8")  # convert str to bytes
+
         tarinfo = tarfile.TarInfo(name="server.py")
         tarinfo.size = len(data)
         tarinfo.mtime = time.time()
+
         data_tar.addfile(tarinfo, BytesIO(data))
         data_tar.close()
         data_tar_stream.seek(0)
+
         return {"Success": self.docker_client.put_archive(
             container=self.container.get('Id'),
             path=container_directory,
@@ -68,12 +70,15 @@ class Sandbox(object):
         data_tar_stream = BytesIO()
         data_tar = tarfile.TarFile(fileobj=data_tar_stream, mode="w")
         data = bytes_data
+
         tarinfo = tarfile.TarInfo(name=file_name)
         tarinfo.size = len(data)
         tarinfo.mtime = time.time()
+
         data_tar.addfile(tarinfo, BytesIO(data))
         data_tar.close()
         data_tar_stream.seek(0)
+
         return {"Success": self.docker_client.put_archive(
             container=self.container.get('Id'),
             path=container_directory,
