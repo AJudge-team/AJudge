@@ -1,4 +1,3 @@
-from .sandbox_mixin import SandboxMixin
+from . sandbox import Sandbox
 
-
-__all__ = ['SandboxMixin']
+__all__ = ['Sandbox']
