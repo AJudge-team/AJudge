@@ -1,4 +1,6 @@
 from subprocess import call
+from sys import exit
 
-call(["python", "-m", "unittest", "discover", "-v", "tests"])
+returncode = call(["python", "-m", "unittest", "discover", "-v", "tests"])
 
+exit(returncode)

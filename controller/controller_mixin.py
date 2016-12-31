@@ -5,5 +5,5 @@ from dto import JudgeContext, RuntimeContext
 class ControllerMixin(ABC):
 
     @abstractmethod
-    def handle_judge_context(self, judge_context: JudgeContext) -> RuntimeContext:
+    def handle(self, judge_context: JudgeContext) -> RuntimeContext:
         pass
