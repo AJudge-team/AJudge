@@ -1,8 +1,7 @@
 import docker
-from .sandbox_mixin import SandboxMixin
 
 
-class Sandbox(SandboxMixin):
+class Sandbox:
 
     def __init__(self):
         """

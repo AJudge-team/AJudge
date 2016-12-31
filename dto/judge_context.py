@@ -1,11 +1,9 @@
-from consts import ProgrammingLanguage
-
 
 class JudgeContext:
     def __init__(self,
                  problem_id: str=None,
                  source_code: str=None,
-                 programming_language: ProgrammingLanguage=None):
+                 programming_language: str=None):
         self.__problem_id = problem_id
         self.__source_code = source_code
         self.__programming_language = programming_language
@@ -33,12 +31,12 @@ class JudgeContext:
         self.__source_code = value
 
     @property
-    def programming_language(self) -> ProgrammingLanguage:
+    def programming_language(self) -> str:
         return self.__programming_language
 
     @programming_language.setter
-    def programming_language(self, value: ProgrammingLanguage):
-        if type(value) is not ProgrammingLanguage:
+    def programming_language(self, value: str):
+        if type(value) is not str:
             raise TypeError
 
         self.__programming_language = value

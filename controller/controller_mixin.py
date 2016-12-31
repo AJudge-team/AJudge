@@ -1,9 +1,26 @@
 from abc import ABC, abstractmethod
 from dto import JudgeContext, JudgeResult, RuntimeContext
-from sandbox import SandboxMixin
+from runner import Runner
+from validator import ValidatorMixin
+from provider import ProblemProvider
 
 
 class ControllerMixin(ABC):
+
+    # a method to insert runner to controller
+    @abstractmethod
+    def add_runner(self, runner_name: str, runner: Runner) -> 'ControllerMixin':
+        pass
+
+    # a setter for validator
+    @abstractmethod
+    def set_validator(self, validator: ValidatorMixin) -> 'ControllerMixin':
+        pass
+
+    # a setter for problem provider
+    @abstractmethod
+    def set_problem_provider(self, problem_provider: ProblemProvider) -> 'ControllerMixin':
+        pass
 
     # entry point for outer module to pass JudgeContext
     @abstractmethod
@@ -17,5 +34,5 @@ class ControllerMixin(ABC):
 
     # a method to choose sandbox according to runtime_context
     @abstractmethod
-    def choose_sandbox(self, judge_context: JudgeContext) -> SandboxMixin:
+    def choose_runner(self, judge_context: JudgeContext) -> Runner:
         pass

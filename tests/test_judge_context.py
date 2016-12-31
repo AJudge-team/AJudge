@@ -42,7 +42,7 @@ class TestJudgeContext(unittest.TestCase):
         @description: Test for correct programming language
     """
     def test_set_programming_language(self):
-        programming_language = ProgrammingLanguage.CPP
+        programming_language = 'cpp'
 
         judge_context = JudgeContext()
         judge_context.programming_language = programming_language
@@ -75,7 +75,7 @@ class TestJudgeContext(unittest.TestCase):
         @description: Test for incorrect programming language
     """
     def test_set_incorrect_programming_language(self):
-        programming_language = 'cpp'
+        programming_language = 1234
 
         judge_context = JudgeContext()
 
