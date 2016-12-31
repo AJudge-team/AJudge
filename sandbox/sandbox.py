@@ -9,7 +9,7 @@ class Sandbox(object):
             Sandbox.docker_client = docker.APIClient(base_url='unix://var/run/docker.sock')
         """
         self.docker_client = docker.APIClient(base_url='unix://var/run/docker.sock')
-        self.container = self.docker_client.create_container("ubuntu:16.04","/bin/bash",detach=True,tty=True)
+        self.container = self.docker_client.create_container("ajudgeteam/ajudge:base","/bin/bash",detach=True,tty=True)
         self.docker_client.start(container=self.container.get('Id'))
 
     def __del__(self):
