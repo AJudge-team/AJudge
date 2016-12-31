@@ -11,7 +11,7 @@ from validator import ValidatorMixin
 class BaseController(ControllerMixin):
     def __init__(self,
                  problem_provider: ProblemProvider=None,
-                 runners: Dict[ProgrammingLanguage, Runner]=None,
+                 runners: Dict[ProgrammingLanguage, Runner]={},
                  validator: ValidatorMixin=None):
 
         self.__problem_provider = problem_provider

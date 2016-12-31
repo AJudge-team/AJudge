@@ -4,6 +4,8 @@ from os import path
 from controller import BaseController
 from consts import *
 from provider import *
+from runner import *
+from sandbox import *
 
 
 class TestBaseController(unittest.TestCase):
@@ -42,3 +44,29 @@ class TestBaseController(unittest.TestCase):
             runtime_context.programming_language,
             ProgrammingLanguage.CPP
         )
+
+    def test_choose_runner1(self):
+
+        class MockSandbox(SandboxMixin):
+            def exec(self, cmd: str):
+                print("Executed")
+
+        class CppRunner(Runner):
+            def prepare(self, runtime_context: RuntimeContext) -> SandboxMixin:
+                print("Prepare")
+                return MockSandbox()
+
+            def run(self, runtime_context: RuntimeContext, sandbox: SandboxMixin):
+                print("Run")
+
+        cpp_runner = CppRunner()
+        rc = RuntimeContext(programming_language=ProgrammingLanguage.CPP)
+
+        self.base_controller.add_runner(
+            ProgrammingLanguage.CPP,
+            cpp_runner
+        )
+
+        chosen_runner = self.base_controller.choose_runner(rc)
+
+        self.assertIs(cpp_runner, chosen_runner)
