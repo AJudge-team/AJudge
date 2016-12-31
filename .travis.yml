@@ -4,3 +4,6 @@ python:
 
 # command to run tests
 script: python test.py
+
+notifications:
+  slack: ccw-geeks:J7F1Lq4jHyoP6vP33SwDWFKf
