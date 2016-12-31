@@ -1,4 +1,6 @@
 from dto import ProblemMetadata
+from os import path
+import glob
 
 
 class ProblemProvider:
@@ -10,5 +12,29 @@ class ProblemProvider:
         problem_metadata = ProblemMetadata()
 
         problem_metadata.problem_id = problem_id
+
+        dir_path = path.join(path.dirname(__file__), "../samples/"+problem_id)
+
+        inputs = []
+        outputs = []
+
+        for file in glob.iglob(dir_path+"/*.in"):
+            basename = path.basename(file)
+            basename = basename.split('.')[0]
+
+            idx = int(basename.split('d')[1])
+
+            inputs.insert(idx, "".join(open(file, "r").readlines()))
+
+        for file in glob.iglob(dir_path+"/*.out"):
+            basename = path.basename(file)
+            basename = basename.split('.')[0]
+
+            idx = int(basename.split('d')[1])
+
+            outputs.insert(idx, "".join(open(file, "r").readlines()))
+
+        problem_metadata.inputs = inputs
+        problem_metadata.outputs = outputs
 
         return problem_metadata

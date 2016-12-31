@@ -9,7 +9,6 @@ from os import path
 from consts import *
 from runner import Runner
 from sandbox import SandboxMixin
-import sys
 
 
 def fill_judge_context(judge_context, params):
@@ -95,14 +94,10 @@ def start(app):
     except Exception as e:
         print(e)
 
-start.add_param("-s", "--source", help="source code location",
-                default=None, type=str)
 
-start.add_param("-l", "--language", help="programming language",
-                default=None, type=str)
-
-start.add_param("-p", "--problem", help="problem id",
-                default=None, type=str)
+start.add_param("-s", "--source", help="source code location", default=None, type=str)
+start.add_param("-l", "--language", help="programming language", default=None, type=str)
+start.add_param("-p", "--problem", help="problem id", default=None, type=str)
 
 if __name__ == "__main__":
     start.run()
