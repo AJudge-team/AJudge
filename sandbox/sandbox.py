@@ -14,7 +14,7 @@ class Sandbox(object):
             Sandbox.docker_client = docker.APIClient(base_url='unix://var/run/docker.sock')
         """
 
-        IMG_SRC = "ajudgeteam/ajudge:test"
+        IMG_SRC = "ajudgeteam/ajudge:base"
         DEFAULT_CONTAINER_PORT = 50000
 
         if host_port is None:
