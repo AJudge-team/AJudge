@@ -20,7 +20,8 @@ class SandboxMethodTests(unittest.TestCase):
         test_cmd = "echo -n " + test_str
         result = sandbox.exec(test_cmd)
         del sandbox
-        self.assertEqual(test_str, str(result.get('Output'),'utf-8'))
+
+        self.assertEqual(test_str, str(result.get('Output'), 'utf-8'))
         self.assertEqual(0, result.get('ExitCode'))
 
     def test_exec_echo2(self):
@@ -29,6 +30,7 @@ class SandboxMethodTests(unittest.TestCase):
         test_cmd = "echo -n " + test_str
         result = sandbox.exec(test_cmd)
         del sandbox
+
         self.assertEqual(test_str, str(result.get('Output'), 'utf-8'))
         self.assertEqual(0, result.get('ExitCode'))
 
@@ -38,6 +40,7 @@ class SandboxMethodTests(unittest.TestCase):
         test_cmd = "echo -n " + test_str
         result = sandbox.exec(test_cmd)
         del sandbox
+
         self.assertEqual(test_str, str(result.get('Output'), 'utf-8'))
         self.assertEqual(0, result.get('ExitCode'))
 
@@ -47,31 +50,45 @@ class SandboxMethodTests(unittest.TestCase):
         test_cmd = "echo -n " + test_str
         result = sandbox.exec(test_cmd)
         del sandbox
+
         self.assertEqual(test_str, str(result.get('Output'), 'utf-8'))
         self.assertEqual(0, result.get('ExitCode'))
 
-    def test_copy_file_to_container(self):
+    def test_host_file_not_found(self):
         sandbox = Sandbox(54321)
-        sandbox.copy_file_to_container("../tests/resources/server.py", "/")
+        with self.assertRaises(FileNotFoundError):
+            sandbox.copy_host_file_to_container(host_directory="../tests/resources/app.py", container_directory="/")
+            del sandbox
+
+    def test_copy_host_file_to_container(self):
+        sandbox = Sandbox(54321)
+        sandbox.copy_host_file_to_container(host_directory="../tests/resources/server.py", container_directory="/")
         result = sandbox.exec('[ -e "/server.py" ]')
         del sandbox
+
         self.assertEqual(0, result.get('ExitCode'))
 
-    def test_copy_bytes_to_container(self):
+    def test_copy_host_to_container(self):
         sandbox = Sandbox(54321)
-        data = "data"
-        data = str.encode(data)
-        sandbox.copy_bytes_to_container(data, "/", "generated.dat")
+        source = "this is host's data"
+        source = str.encode(source)  # convert str to bytes
+        snd = sandbox.copy_host_to_container(source=source, container_directory="/", container_file_name="generated.dat")
         result = sandbox.exec('[ -e "/generated.dat" ]')
         del sandbox
+
         self.assertEqual(0, result.get('ExitCode'))
 
-    def test_send_data_and_receive_data(self):
+        snd = snd['Source']
+        self.assertEqual(source, snd)
+
+    def test_send_and_receive_file(self):
         sandbox = Sandbox(54321)
-        snd = sandbox.copy_file_to_container("../tests/resources/server.py", "/")
-        snd = snd["Bytes"]
+        snd = sandbox.copy_host_file_to_container(host_directory="../tests/resources/server.py", container_directory="/")
         result = sandbox.exec("cat /server.py")
         del sandbox
+
         self.assertEqual(0, result.get('ExitCode'))
+
+        snd = snd['Source']
         rcv = result['Output']
         self.assertEqual(snd, rcv)
