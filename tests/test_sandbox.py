@@ -104,3 +104,25 @@ class SandboxMethodTests(unittest.TestCase):
         result = sandbox.exec('cat /write_file_test.txt')
         self.assertEqual(file_contents, result.get('Output'))
 
+    def test_get_files_from_sandbox(self):
+        sandbox = Sandbox(54321)
+
+        # get .py files under tests/resources/
+        files = []
+        resources_path = self.PROJECT_ROOT.joinpath('./tests/resources')
+        for path in resources_path.glob('*.py'):
+            file_obj = open(path, 'rb')
+            files.append((path.name, file_obj.read()))
+            file_obj.close()
+
+        # make directory for them
+        res = sandbox.exec('mkdir /workdir/test_copy')
+        self.assertEqual(0, res.get('ExitCode'))
+
+        # send them all
+        res = sandbox.write_files_in_sandbox(files, '/workdir/test_copy')
+        self.assertTrue(res)
+
+        # get and check
+        res = sandbox.get_files_from_sandbox('/workdir/test_copy/.')
+        self.assertListEqual(files, res)

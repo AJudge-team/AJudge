@@ -48,7 +48,7 @@ class Sandbox(object):
     # file_path : absolute path to a file
     # dest_path : path to a directory.
     #             absolute path or relative path (relative to root directory)
-    def copy_file_to_sandbox(self, file_path: str, dest_path: str) -> dict:
+    def copy_file_to_sandbox(self, file_path: str, dest_path: str) -> bool:
         files = [] # file name, binary pair
         file_path = Path(file_path)
         if (not file_path.is_absolute()) or (not file_path.is_file()): # deny relative path or non-file
@@ -64,7 +64,7 @@ class Sandbox(object):
     # write files in sandbox
     # dest_path : path to sandbox directory
     # files : list of (filename, bytes) pair
-    def write_files_in_sandbox(self, files, dest_dir: str) -> dict:
+    def write_files_in_sandbox(self, files, dest_dir: str) -> bool:
         tar_file = BytesIO()  # use BytesIO to store tarfile in memory
 
         tarobj = tarfile.open(fileobj=tar_file, mode="w")
@@ -78,3 +78,24 @@ class Sandbox(object):
         tar_file.seek(0)  # set stream position is start of the stream
         data = tar_file.read()
         return self.docker_client.put_archive(self.container.get('Id'), dest_dir, data)
+
+    # get file from sandbox
+    # file_path : A path to a file or a directory
+    # For a directory, file_path should be end with '/' or '/.'
+    # If path ends in /. then this indicates that only the contents of the path directory should be copied.
+    # A symlink is always resolved to its target.
+
+    def get_files_from_sandbox(self, file_path: str):
+        res = [] # list of (filename, bytes) pair
+
+        # Do we need to validate file_path?
+        tar_data, stat_info = self.docker_client.get_archive(self.container.get('Id'), file_path)
+        tar_data = tar_data.data # get data from HTTPresponse
+
+        tar_stream = BytesIO(tar_data)
+        tar_obj = tarfile.open(fileobj=tar_stream)
+        for tar_info in tar_obj:
+            if tar_info.isfile(): # only file
+                # FIXME tar_info.name has additional charactor
+                res.append((str(Path(tar_info.name).name), tar_obj.extractfile(tar_info).read()))
+        return res
