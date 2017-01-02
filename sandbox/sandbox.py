@@ -1,6 +1,6 @@
 import docker
 import tarfile
-import time
+from pathlib import PurePosixPath
 import os
 from io import BytesIO
 
@@ -55,13 +55,7 @@ class Sandbox(object):
         source = str.encode(source)  # convert str to bytes
 
         # extract file name in directory
-        host_file_name = host_directory
-        st = 0
-        host_file_length = len(host_file_name)
-        for i in range(0, host_file_length):
-            if host_file_name[i] == '/':
-                st = i + 1
-        host_file_name = host_file_name[st:]
+        host_file_name = PurePosixPath(host_directory).name
 
         return self.copy_host_to_container(
             source=source,
@@ -86,3 +80,4 @@ class Sandbox(object):
             path=container_directory,
             data=data
         ), 'Source': source}
+
