@@ -6,7 +6,7 @@ from sandbox import Sandbox
 
 class SandboxMethodTests(unittest.TestCase):
     def setUp(self):
-        self.PROJECT_ROOT = (Path(__file__).parent).resolve() # path to project root
+        self.PROJECT_ROOT = (Path(__file__).parents[1]).resolve() # path to project root
 
     def test_constructor_parameter_is_empty_validation(self):
         with self.assertRaises(Exception):
@@ -68,7 +68,7 @@ class SandboxMethodTests(unittest.TestCase):
 
     def test_copy_file_to_sandbox(self):
         sandbox = Sandbox(54321)
-        file_path = self.PROJECT_ROOT.joinpath('./resources/server.py')
+        file_path = self.PROJECT_ROOT.joinpath('./tests/resources/server.py')
 
         # copy
         result = sandbox.copy_file_to_sandbox(file_path, '/')
