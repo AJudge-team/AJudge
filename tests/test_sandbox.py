@@ -104,7 +104,7 @@ class SandboxMethodTests(unittest.TestCase):
         result = sandbox.exec('cat /write_file_test.txt')
         self.assertEqual(file_contents, result.get('Output'))
 
-    def test_get_files_from_sandbox(self):
+    def test_send_and_get_files_from_sandbox(self):
         sandbox = Sandbox(54321)
 
         # get .py files under tests/resources/

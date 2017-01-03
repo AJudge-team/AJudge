@@ -1,8 +1,8 @@
 import docker
 import tarfile
 from pathlib import Path
-import os
 from io import BytesIO
+from typing import List, Tuple
 
 
 class Sandbox(object):
@@ -64,7 +64,7 @@ class Sandbox(object):
     # write files in sandbox
     # dest_path : path to sandbox directory
     # files : list of (filename, bytes) pair
-    def write_files_in_sandbox(self, files, dest_dir: str) -> bool:
+    def write_files_in_sandbox(self, files: List[Tuple[str, bytes]], dest_dir: str) -> bool:
         tar_file = BytesIO()  # use BytesIO to store tarfile in memory
 
         tarobj = tarfile.open(fileobj=tar_file, mode="w")
@@ -84,7 +84,6 @@ class Sandbox(object):
     # For a directory, file_path should be end with '/' or '/.'
     # If path ends in /. then this indicates that only the contents of the path directory should be copied.
     # A symlink is always resolved to its target.
-
     def get_files_from_sandbox(self, file_path: str):
         res = [] # list of (filename, bytes) pair
 
