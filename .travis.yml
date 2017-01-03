@@ -4,7 +4,7 @@ services:
     - docker
 
 before_install:
-    - docker pull ajudgeteam/ajudge:test
+    - docker pull ajudgeteam/ajudge:base
 
 language: python
 python:
