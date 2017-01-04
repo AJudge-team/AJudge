@@ -5,7 +5,8 @@ from io import BytesIO
 from typing import List, Tuple
 
 
-class Sandbox(object):
+
+class Sandbox:
 
     def __init__(self, host_port=None):
         """
