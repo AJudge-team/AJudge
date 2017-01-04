@@ -8,7 +8,7 @@ from dto import *
 from os import path
 from consts import *
 from runner import Runner
-from sandbox import SandboxMixin
+from sandbox import Sandbox
 
 
 def fill_judge_context(judge_context, params):
@@ -29,36 +29,54 @@ def fill_judge_context(judge_context, params):
     file.close()
 
 
-class MockSandbox(SandboxMixin):
-    def exec(self, cmd: str):
-        print("[Mock sandbox] cmd '{0}'".format(cmd))
-
-
 class MockCppRunner(Runner):
-    def prepare(self, runtime_context: RuntimeContext) -> SandboxMixin:
+    def prepare(self, runtime_context: RuntimeContext) -> Sandbox:
         print("[Mock cpp runner] '{0}' is prepared.".format(
             runtime_context.programming_language.name
         ))
 
-        mock_sandbox = MockSandbox()
+        sandbox = Sandbox(54321)
+        inputfiles = [("solution.cc",str.encode(runtime_context.source_code))]
+        idx = 0
+        for input in runtime_context.problem_metadata.inputs:
+            inputfiles.append(("input{0}.in".format(idx),str.encode(input)))
+            idx+=1
+            print("copy")
 
-        return mock_sandbox
+        res = sandbox.write_files_in_sandbox(inputfiles,"/workdir")
+        if res is False:
+            raise Exception
+        else:
+            print("write")
 
-    def run(self, runtime_context: RuntimeContext, sandbox: SandboxMixin):
-        print("[Mock cpp runner] '{0}' is run.".format(
-            runtime_context.programming_language.name
-        ))
+        res = sandbox.exec("mkdir /workdir/outputs")
+        if res.get('ExitCode') is not 0:
+            raise Exception
+        else :
+            print ("mkdir")
 
-        sandbox.exec("{0} {1}".format(
-            runtime_context.programming_language.name,
-            runtime_context.problem_metadata.problem_id
-        ))
+        res = sandbox.exec("g++ -std=c++11 -O2 -Wall /workdir/solution.cc -o /workdir/solution")
+        if res.get('ExitCode') is not 0:
+            raise Exception
+        else:
+            print ("compile")
 
-        problem_provider = ProblemProvider()
+        return sandbox
 
-        return problem_provider.get_problem_metadata_by_id(
-            runtime_context.problem_metadata.problem_id
-        ).outputs
+    def run(self, runtime_context: RuntimeContext, sandbox: Sandbox):
+        print("[Mock cpp runner] run")
+        user_outputs = []
+        results = []
+        cmd = "/workdir/judge_client 512 5 /workdir/input{0}.in /workdir/outputs/output{1}.in /workdir/error{2}.log /workdir/solution"
+
+        for idx in range(0, len(runtime_context.problem_metadata.inputs)):
+            results.append(sandbox.exec(cmd.format(idx,idx,idx)))
+
+        outputs = sandbox.get_files_from_sandbox("/workdir/outputs/")
+        for n, output in outputs:
+            user_outputs.append(output.encode('utf8'))
+
+        return user_outputs
 
 
 @cli.app.CommandLineApp
