@@ -36,45 +36,41 @@ class MockCppRunner(Runner):
         ))
 
         sandbox = Sandbox(54321)
-        inputfiles = [("solution.cc",str.encode(runtime_context.source_code))]
-        idx = 0
-        for input in runtime_context.problem_metadata.inputs:
-            inputfiles.append(("input{0}.in".format(idx),str.encode(input)))
-            idx+=1
-            print("copy")
+        input_files = [("solution.cc", str.encode(runtime_context.source_code))]
+        for input_name, input_content in runtime_context.problem_metadata.inputs.items():
+            input_files.append((input_name, str.encode(input_content)))
 
-        res = sandbox.write_files_in_sandbox(inputfiles,"/workdir")
+        res = sandbox.write_files_in_sandbox(input_files, "/workdir")
         if res is False:
             raise Exception
-        else:
-            print("write")
 
         res = sandbox.exec("mkdir /workdir/outputs")
         if res.get('ExitCode') is not 0:
             raise Exception
-        else :
-            print ("mkdir")
 
         res = sandbox.exec("g++ -std=c++11 -O2 -Wall /workdir/solution.cc -o /workdir/solution")
         if res.get('ExitCode') is not 0:
+            print('compile error')
             raise Exception
-        else:
-            print ("compile")
 
         return sandbox
 
     def run(self, runtime_context: RuntimeContext, sandbox: Sandbox):
         print("[Mock cpp runner] run")
-        user_outputs = []
+        user_outputs = {}
         results = []
-        cmd = "/workdir/judge_client 512 5 /workdir/input{0}.in /workdir/outputs/output{1}.in /workdir/error{2}.log /workdir/solution"
+        cmd_holder = "/workdir/judge_client 512 5 /workdir/{0}" + \
+                     " /workdir/outputs/{1}.out" + \
+                     " /workdir/{1}.err /workdir/solution"
 
-        for idx in range(0, len(runtime_context.problem_metadata.inputs)):
-            results.append(sandbox.exec(cmd.format(idx,idx,idx)))
+        for input_name, input in runtime_context.problem_metadata.inputs.items():
+            basename = input_name.split('.')[0]
+            cmd = cmd_holder.format(input_name, basename)
+            results.append(sandbox.exec(cmd))
 
         outputs = sandbox.get_files_from_sandbox("/workdir/outputs/")
-        for n, output in outputs:
-            user_outputs.append(output.encode('utf8'))
+        for name, output in outputs:
+            user_outputs[name] = str(output, 'UTF-8')
 
         return user_outputs
 
@@ -114,7 +110,9 @@ def start(app):
         return
 
     try:
-        base_controller.handle(judge_context)
+        judge_result = base_controller.handle(judge_context)
+        print(judge_result.is_accepted)
+        print(judge_result.message)
     except Exception as e:
         print(e)
 

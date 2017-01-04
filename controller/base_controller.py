@@ -50,6 +50,7 @@ class BaseController(ControllerMixin):
                 judge_context.problem_id
             )
 
+        runtime_context.source_code = judge_context.source_code
         return runtime_context
 
     def choose_runner(self, runtime_context: RuntimeContext) -> Runner:
@@ -72,14 +73,14 @@ class BaseController(ControllerMixin):
             if len(user_outputs) is not len(runtime_context.problem_metadata.outputs):
                 raise Exception('Wrong answer')
 
-            for i in range(0, len(user_outputs)):
+            for output_name, output_content in user_outputs.items():
                 result = self.__validator.validate(
-                    user_outputs[i],
-                    runtime_context.problem_metadata.outputs[i]
+                    output_content,
+                    runtime_context.problem_metadata.outputs[output_name]
                 )
 
                 if result is False:
-                    raise Exception('Wrong answer')
+                    raise Exception("Wrong Answer at " + output_name)
 
             judge_result.is_accepted = True
 
@@ -87,5 +88,4 @@ class BaseController(ControllerMixin):
             judge_result.is_accepted = False
             judge_result.message = e
 
-        print(judge_result.is_accepted)
         return judge_result

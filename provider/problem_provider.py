@@ -15,24 +15,24 @@ class ProblemProvider:
 
         dir_path = path.join(path.dirname(__file__), "../samples/"+problem_id)
 
-        inputs = []
-        outputs = []
+        inputs = {}
+        outputs = {}
 
         for file in glob.iglob(dir_path+"/*.in"):
             basename = path.basename(file)
+            file_name = basename
             basename = basename.split('.')[0]
-
             idx = int(basename.split('d')[1])
 
-            inputs.insert(idx, "".join(open(file, "r").readlines()))
+            inputs[file_name] = "".join(open(file, "r").readlines())
 
         for file in glob.iglob(dir_path+"/*.out"):
             basename = path.basename(file)
+            file_name = basename
             basename = basename.split('.')[0]
-
             idx = int(basename.split('d')[1])
 
-            outputs.insert(idx, "".join(open(file, "r").readlines()))
+            outputs[file_name] = "".join(open(file, "r").readlines())
 
         problem_metadata.inputs = inputs
         problem_metadata.outputs = outputs
