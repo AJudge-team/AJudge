@@ -7,7 +7,7 @@ import cli.app
 from dto import *
 from os import path
 from consts import *
-from runner import Runner
+from runner import *
 from sandbox import Sandbox
 
 
@@ -27,53 +27,6 @@ def fill_judge_context(judge_context, params):
 
     judge_context.source_code = content
     file.close()
-
-
-class MockCppRunner(Runner):
-    def prepare(self, runtime_context: RuntimeContext) -> Sandbox:
-        print("[Mock cpp runner] '{0}' is prepared.".format(
-            runtime_context.programming_language.name
-        ))
-
-        sandbox = Sandbox(54321)
-        input_files = [("solution.cc", str.encode(runtime_context.source_code))]
-        for input_name, input_content in runtime_context.problem_metadata.inputs.items():
-            input_files.append((input_name, str.encode(input_content)))
-
-        res = sandbox.write_files_in_sandbox(input_files, "/workdir")
-        if res is False:
-            raise Exception
-
-        res = sandbox.exec("mkdir /workdir/outputs")
-        if res.get('ExitCode') is not 0:
-            raise Exception
-
-        res = sandbox.exec("g++ -std=c++11 -O2 -Wall /workdir/solution.cc -o /workdir/solution")
-        if res.get('ExitCode') is not 0:
-            print('compile error')
-            raise Exception
-
-        return sandbox
-
-    def run(self, runtime_context: RuntimeContext, sandbox: Sandbox):
-        print("[Mock cpp runner] run")
-        user_outputs = {}
-        results = []
-        cmd_holder = "/workdir/judge_client 512 5 /workdir/{0}" + \
-                     " /workdir/outputs/{1}.out" + \
-                     " /workdir/{1}.err /workdir/solution"
-
-        for input_name, input in runtime_context.problem_metadata.inputs.items():
-            basename = input_name.split('.')[0]
-            cmd = cmd_holder.format(input_name, basename)
-            results.append(sandbox.exec(cmd))
-
-        outputs = sandbox.get_files_from_sandbox("/workdir/outputs/")
-        for name, output in outputs:
-            user_outputs[name] = str(output, 'UTF-8')
-
-        return user_outputs
-
 
 @cli.app.CommandLineApp
 def start(app):
@@ -98,7 +51,7 @@ def start(app):
         .set_validator(validator)\
         .add_runner(
             ProgrammingLanguage.CPP,
-            MockCppRunner()
+            CppRunner()
         )
 
     judge_context = JudgeContext()
@@ -111,8 +64,14 @@ def start(app):
 
     try:
         judge_result = base_controller.handle(judge_context)
-        print(judge_result.is_accepted)
-        print(judge_result.message)
+        if judge_result.is_accepted:
+            print("CORRECT")
+            print("Memory : {0}kb".format(judge_result.peak_memory))
+            print("Time   : {0}".format(judge_result.used_time))
+        else:
+            print("WRONG ANSWER")
+            print(judge_result.message)
+
     except Exception as e:
         print(e)
 

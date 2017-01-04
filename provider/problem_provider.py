@@ -1,6 +1,7 @@
 from dto import ProblemMetadata
 from os import path
 import glob
+import json
 
 
 class ProblemProvider:
@@ -37,4 +38,7 @@ class ProblemProvider:
         problem_metadata.inputs = inputs
         problem_metadata.outputs = outputs
 
+        problem_limits = json.loads(open(dir_path+"/problem_info.json", "r").read())
+        problem_metadata.time_limit = problem_limits["TimeLimit"]
+        problem_metadata.memory_limit = problem_limits["MemoryLimit"]
         return problem_metadata

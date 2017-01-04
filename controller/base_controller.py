@@ -5,6 +5,7 @@ from consts import ProgrammingLanguage
 from provider import ProblemProvider
 from typing import Dict
 from validator import ValidatorMixin
+import json
 from exception import *
 
 
@@ -68,10 +69,29 @@ class BaseController(ControllerMixin):
 
         try:
             sandbox = runner.prepare(runtime_context)
-            user_outputs = runner.run(runtime_context, sandbox)
+            run_info = runner.run(runtime_context, sandbox)
+            user_outputs = run_info.get('UserOutput')
+            run_info = run_info.get('RunInfo')
+
+            for output_name,run_info_json in run_info.items():
+                _run_info = json.loads(run_info_json)
+                if _run_info['OK'] is not True:
+                    raise Exception('Judge Failed')
+                if _run_info['Signaled'] is True:
+                    raise Exception('Runtime Error : ' + str(_run_info['Signal']) +"("+_run_info['SignalStr']+")")
+
+                if judge_result.peak_memory < _run_info['PeakMemory']:
+                    judge_result.peak_memory = _run_info['PeakMemory']
+
+                user_time = _run_info['UserTime'][0] + (_run_info['UserTime'][1]/(1e+6))
+                sys_time = _run_info['SysTime'][0] + (_run_info['SysTime'][1]/(1e+6))
+                if judge_result.used_time < (user_time + sys_time):
+                    judge_result.used_time = (user_time + sys_time)
+
 
             if len(user_outputs) is not len(runtime_context.problem_metadata.outputs):
                 raise Exception('Wrong answer')
+
 
             for output_name, output_content in user_outputs.items():
                 result = self.__validator.validate(
