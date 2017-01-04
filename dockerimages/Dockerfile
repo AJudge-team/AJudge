@@ -1,6 +1,6 @@
 # in ubuntu 16.04, install python-3.6, g++
 FROM ubuntu:16.04
-RUN apt-get update
+RUN apt update
 
 # settings for install
 RUN apt install -y software-properties-common
@@ -29,10 +29,10 @@ RUN mv /workdir/Judge/Judge /workdir/judge_client
 RUN rm -rf /workdir/Judge/
 
 # remove git
-RUN apt autoremove git
+RUN apt autoremove -y git
 
 # remove make
-RUN apt autoremove make
+RUN apt autoremove -y make
 
 # clear apt cache
 RUN rm -rf /var/lib/apt/lists/*
