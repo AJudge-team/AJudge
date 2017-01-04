@@ -1,7 +1,6 @@
 # A-Judge [![Build Status](https://travis-ci.org/AJudge-team/AJudge.svg?branch=master)](https://travis-ci.org/AJudge-team/AJudge)
 
 ## Abstract
----
 A-Judge는 Open-source Online Judge Platform이다.
 
 A-Judge는 온라인 저지에서 필요한 소스 코드의 컴파일, 실행, 채점, 그리고 결과를 제공한다. 따라서, A-Judge를 사용한다면 누구나 쉽게 채점 모듈을 추가하고 채점 사이트를 구축할 수 있다.
@@ -9,7 +8,6 @@ A-Judge는 온라인 저지에서 필요한 소스 코드의 컴파일, 실행, 
 온라인 저지 서비스를 제공하는 곳의 예로, BOJ (https://www.acmicpc.net/), algospot (https://algospot.com/), Lavida Online Judge (http://lavida.us/)등이 있다.
 
 ## Usecase
----
 1. 유저가 소스 코드를 작성하고 이를 APP Server에 제출한다.
 1. APP Server가 유저의 요청을 받고, 이를 분석해서 Judge Context를 채운다.
 1. Judge Context를 Controller에게 넘긴다.
@@ -24,18 +22,21 @@ A-Judge는 온라인 저지에서 필요한 소스 코드의 컴파일, 실행, 
 A-Judge는 3~9 Usecase 를 담당하는 Open-source Online Judge Platform이다.
 
 ## demonstration
----
 [영상]()
 
 ## ThirdParty Libraries
 ---
 (docker) (https://github.com/docker/docker)
+
 (docker-py) (https://github.com/docker/docker-py)
+
 (pyenv) (https://github.com/yyuu/pyenv)
+
 (requests) (https://github.com/kennethreitz/requests)
+
 (six) (https://github.com/JioCloud/python-six/blob/master/setup.py)
+
 (websocket-client) (https://github.com/liris/websocket-client)
 
 ## License
----
 MIT
