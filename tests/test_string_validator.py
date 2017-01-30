@@ -38,3 +38,15 @@ class StringValidatorClassTest(unittest.TestCase):
 
     def test_validate_incorrect_type(self):
         self.assertRaises(TypeError, self.stringValidator.validate("123", 123))
+
+    def test_validate_erasing_all_spaces(self):
+        self.assertTrue(self.stringValidator.validate_with_erasing_all_spaces("1 2 3\n 4 \t 5", "1 2 3 4 5"))
+
+    def test_validate_erasing_all_spaces2(self):
+        self.assertTrue(self.stringValidator.validate_with_erasing_all_spaces("1 2 3\n 4 \t 5", "1 2 3 4 5            "))
+
+    def test_validate_erasing_trailing_spaces(self):
+        self.assertTrue(self.stringValidator.validate_with_erasing_trailing_spaces("1 \n2  \n3\n", "1\n2\n3\n"))
+
+    def test_validate_erasing_trailing_spaces2(self):
+        self.assertTrue(self.stringValidator.validate_with_erasing_trailing_spaces("1 \n2  \n3\n", "1\n2\n3\n\n"))
