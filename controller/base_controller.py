@@ -74,7 +74,7 @@ class BaseController(ControllerMixin):
             run_info = run_info.get('RunInfo')
 
             for output_name,run_info_json in run_info.items():
-                _run_info = json.loads(run_info_json)
+                _run_info = json.loads(run_info_json.decode("utf-8"))
                 if _run_info['OK'] is not True:
                     raise Exception('Judge Failed')
                 if _run_info['Signaled'] is True:
